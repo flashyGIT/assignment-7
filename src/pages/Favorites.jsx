@@ -18,7 +18,37 @@ function Favorites() {
         </div>
       )}
     </main>
+  );  
+  import { useEffect, useState } from "react";
+import MovieGrid from "../components/MovieGrid";
+
+export default function Favorites() {
+  const [favorites, setFavorites] = useState([]);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("movieshelf-favorites") || "[]"
+      );
+
+      setFavorites(Array.isArray(saved) ? saved : []);
+    } catch {
+      setFavorites([]);
+    }
+  }, []);
+
+  return (
+    <main>
+      <h1>My Favorite Movies</h1>
+
+      {favorites.length > 0 ? (
+        <MovieGrid movies={favorites} />
+      ) : (
+        <p>You haven't added any favorite movies yet.</p>
+      )}
+    </main>
   );
+}
 };
 
-export default Favorites;
+export default Favorites; 
