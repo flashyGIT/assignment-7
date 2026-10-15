@@ -1,21 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Home from './pages/Home';
-import Favorites from './pages/Favorites';
-import './App.css';
+import { useState } from "react";
+import { searchMovies } from "./services/movieService";
+import Header from "./components/Header";
+import Home from "./pages/Home";
 
-function App() {
+export default function App() {
+  const [searchResults, setSearchResults] = useState(null);
+  const [searchError, setSearchError] = useState("");
+
+  async function handleSearch(query) {
+    if (!query.trim()) {
+      setSearchResults(null);
+      setSearchError("");
+      return;
+    }
+
+    try {
+      setSearchError("");
+
+      const data = await searchMovies(query);
+      setSearchResults(data.results || []);
+    } catch (err) {
+      setSearchError(err.message || "Search failed.");
+      setSearchResults([]);
+    }
+  }
+
   return (
-    <Router>
-      <div className="app">
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/favorites" element={<Favorites />} />
-        </Routes>
-      </div>
-    </Router>
+    <>
+      <Header onSearch={handleSearch} />
+      {searchError && <p role="alert">{searchError}</p>}
+      <Home searchResults={searchResults} />
+    </>
   );
-};
-
-export default App;
+}
